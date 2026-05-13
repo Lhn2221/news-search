@@ -52,10 +52,10 @@ with tab1:
                         "news_date": "기사 발행일 (예: 2023-10-25)",
                         "url": "기사 원본 URL",
                         "summary": "기사 내용 3줄 요약",
-                        "by": "기자명"
+                        "reporter": "기자명"
                     }}
                 ]
-                절대 URL을 지어내지(환각) 마.
+                절대 URL을 지어내지(환각) 마. 기자명을 알 수 없는 경우 '미상'으로 표기해줘.
                 """
                 
                 # Gemini API 호출 (온도 0.0, 구글 검색 도구 활성화)
@@ -109,7 +109,7 @@ with tab1:
                         # 카드 형태로 화면 출력
                         with st.container():
                             st.markdown(f"### {idx+1}. [{item['title']}]({item['url']})")
-                            st.caption(f"출처: {item['source']} | 날짜: {item['news_date']}")
+                            st.caption(f"출처: {item['source']} | 기자: {item.get('reporter', '미상')} 날짜: {item['news_date']}")
                             st.write(f"**요약:** {item['summary']}")
                             st.divider()
                         
@@ -121,7 +121,8 @@ with tab1:
                                 "source": item['source'],
                                 "news_date": item['news_date'],
                                 "url": item['url'],
-                                "summary": item['summary']
+                                "summary": item['summary'],
+                                "reporter": item.get('reporter', '미상'),
                             }
                             supabase.table("news_history").insert(db_data).execute()
                             saved_count += 1
@@ -163,7 +164,7 @@ with tab2:
         
         # 데이터프레임 출력
         st.dataframe(
-            df[['keyword', 'title', 'source', 'news_date', 'url', 'created_at']],
+            df[['keyword', 'title', 'source', 'reporter', 'news_date', 'url', 'created_at']],
             use_container_width=True,
             hide_index=True
         )
